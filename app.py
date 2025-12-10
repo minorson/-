@@ -35,37 +35,14 @@ if query:
                         pass # 로딩 실패한 건 쿨하게 패스
 
         elif "동영상" in search_type:
-            st.subheader(f"🎥 '{query}' 동영상 사냥 결과 (유튜브 제외)")
-            results_raw = ddgs.videos(query, region='wt-wt', safesearch='off', max_results=max_results * 2) # 더 많이 가져와서 필터링
+            st.subheader(f"🎥 '{query}' 동영상 사냥 결과")
+            results = ddgs.videos(query, region='wt-wt', safesearch='off', max_results=max_results)
             
-            # --- 유튜브 제외 필터링 추가 ---
-            # youtube.com 또는 youtu.be 링크를 포함하는 결과를 제외합니다.
-            youtube_domains = ['youtube.com', 'youtu.be']
-            
-            filtered_results = []
-            for r in results_raw:
-                is_youtube = False
-                # r['content'] 키가 영상의 실제 URL을 담고 있으며, 이를 확인하여 유튜브인지 판단합니다.
-                if r.get('content'):
-                    for domain in youtube_domains:
-                        if domain in r['content']:
-                            is_youtube = True
-                            break
-                if not is_youtube:
-                    filtered_results.append(r)
-                
-            # 최종 결과는 요청한 max_results 수로 제한합니다.
-            results = filtered_results[:max_results]
-            # ---------------------------
-
-            if not results:
-                st.info("죄송합니다, 필터링 후 표시할 만한 동영상 결과가 없습니다.")
-
             for r in results:
                 with st.expander(f"🎬 {r['title']}"):
                     st.write(f"게시자: {r['publisher']}")
                     st.write(r['description'])
-                    # st.video(r['content']) # Streamlit의 st.video는 특정 URL 형식을 요구하므로, 실패가 잦을 수 있어 일단 주석 처리
+                    st.video(r['content']) # 가능한 경우 플레이어 로드
                     st.write(f"[영상 보러가기]({r['content']})")
 
         else: # 텍스트
